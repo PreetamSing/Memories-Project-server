@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 
 import postRoutes from './routes/posts.js';
 import userRoutes from './routes/users.js';
@@ -14,8 +15,16 @@ app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
-app.use('/posts', postRoutes);
-app.use('/user', userRoutes);
+// Have Node serve the files for our built React app
+app.use(express.static(path.resolve('../client/build')));
+
+app.use('/api/posts', postRoutes);
+app.use('/api/user', userRoutes);
+
+// All other GET requests not handled before will return our React app
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve('../client/build', 'index.html'));
+  });
 
 const PORT = process.env.PORT || 5000;
 
