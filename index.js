@@ -4,26 +4,29 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import * as admin from 'firebase-admin';
 
 import postRoutes from './routes/posts.js';
-import userRoutes from './routes/users.js';
 
 const app = express();
 dotenv.config();
+
+export default admin.default.initializeApp({
+  credential: admin.default.credential.applicationDefault()
+});
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
 // Have Node serve the files for our built React app
-app.use(express.static(path.resolve('../client/build')));
+app.use(express.static(path.resolve('../client-mysampleprojects.tech/build')));
 
 app.use('/api/posts', postRoutes);
-app.use('/api/user', userRoutes);
 
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve('../client/build', 'index.html'));
+    res.sendFile(path.resolve('../client-mysampleprojects.tech/build', 'index.html'));
   });
 
 const PORT = process.env.PORT || 5000;

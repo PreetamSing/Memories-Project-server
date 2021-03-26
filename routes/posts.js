@@ -8,8 +8,8 @@ const router = express.Router();
 
 // localhost:5000/   This won't reach 'cause we added a prefix of '/posts' in index.js
 // localhost:5000/posts/   This will reach
-router.get('/', getPosts);
-router.post('/', auth, createPost);
+router.post('/', auth, getPosts);
+router.post('/create', auth, createPost);
 router.patch('/:id', auth, updatePost);
 router.delete('/:id', auth, deletePost);
 router.patch('/:id/likePost', auth, likePost);
