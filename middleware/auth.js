@@ -1,30 +1,24 @@
-import jwt from 'jsonwebtoken';
+import admin from '../index.js';
 
 //Working of Middleware: Suppose a user wants to like a post
 // click the like button => auth middleware(next) => like controller...
 
 const auth = async (req, res, next) => {
-    try {
-        const token = req.headers.authorization.split(" ")[1];
-        const isCustomAuth = token.length < 500;
+    const idToken = req.headers.authorization;
 
-        let decodedData;
+    // idToken comes from the client app
+    admin
+        .auth()
+        .verifyIdToken(idToken)
+        .then((decodedToken) => {
+            req.userId = decodedToken.uid;
 
-        if(token && isCustomAuth) {
-            decodedData = jwt.verify(token, 'test');
-
-            req.userId = decodedData?.id;
-        }
-        else {
-            decodedData = jwt.decode(token);
-
-            req.userId = decodedData?.sub;
-        }
-
-        next();
-    } catch (error) {
-        console.log(error);
-    }
+            next();
+        })
+        .catch((error) => {
+            // Handle error
+            console.log(error);
+        });
 }
 
 

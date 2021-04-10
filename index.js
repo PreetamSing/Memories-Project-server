@@ -4,26 +4,36 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import * as admin from 'firebase-admin';
+import expressWs from 'express-ws';
 
 import postRoutes from './routes/posts.js';
-import userRoutes from './routes/users.js';
+import portfolioRoutes from './routes/portfolio.js';
+import { setupConnection, createMeeting } from './controllers/videoChat.js';
 
 const app = express();
 dotenv.config();
+const newApp = expressWs(app);
+
+export default admin.default.initializeApp({
+  credential: admin.default.credential.applicationDefault()
+});
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
 // Have Node serve the files for our built React app
-app.use(express.static(path.resolve('../client/build')));
+app.use(express.static(path.resolve('../client-mysampleprojects.tech/build')));
 
 app.use('/api/posts', postRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/portfolio', portfolioRoutes);
+app.get('/api/videoChat/createMeeting', createMeeting)
+app.ws('/api/videoChat/join', setupConnection);
 
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve('../client/build', 'index.html'));
+    res.sendFile(path.resolve('../client-mysampleprojects.tech/build', 'index.html'));
   });
 
 const PORT = process.env.PORT || 5000;
