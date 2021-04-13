@@ -98,7 +98,7 @@ export const setupConnection = (ws, req) => {
                     username
                 }, groups[meetingId][prop].conn)
             }
-            
+
             if (Object.size(groups[meetingId]) === 0) {
                 delete groups[meetingId];
                 meetings.splice(meetings.indexOf(meetingId), 1);
@@ -109,7 +109,12 @@ export const setupConnection = (ws, req) => {
 
 
 function sendData(data, conn) {
-    conn.send(JSON.stringify(data))
+    if (conn?.readyState === 1) {
+        conn.send(JSON.stringify(data));
+    }
+    else {
+        console.log(`connection broken abnormally`);
+    }
 }
 
 function findUser(username, meetingId) {
